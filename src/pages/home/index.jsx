@@ -1,6 +1,7 @@
 import React from "react";
 import Sidebar from "../../components/sidebar";
 import ChatUI from "../../components/chatUi";
+import UploadUI from "../../components/uploadUi/uploadui";
 import { GoSidebarExpand } from "react-icons/go";
 import { useState } from "react";
 const Home = () => {
@@ -9,21 +10,24 @@ const Home = () => {
   console.log(isSidebarOpen)
 
   return (
-    <div className="flex h-screen">
-      {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
-      <div className={`flex-grow transition-all duration-300 ${isSidebarOpen ? 'ml-64' : ''}`}>
-        <ChatUI />
-        {!isSidebarOpen && (
-          <button
-            className="btn btn-primary m-4"
-            onClick={() => setIsSidebarOpen(true)}
-          >
+    // <div className="flex h-screen">
+    //   {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
+    //   <div className={`flex-grow transition-all duration-300 ${isSidebarOpen ? 'ml-64' : ''}`}>
+    //     <ChatUI />
+    //     {!isSidebarOpen && (
+    //       <button
+    //         className="btn btn-primary m-4"
+    //         onClick={() => setIsSidebarOpen(true)}
+    //       >
 
-            Open Sidebar
-          </button>
-        )}
-      </div>
-    </div>
+    //         Open Sidebar
+    //       </button>
+    //     )}
+    //   </div>
+    // </div>
+    <>
+      <UploadUI />
+    </>
   );
 };
 
