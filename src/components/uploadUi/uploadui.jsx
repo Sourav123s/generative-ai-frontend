@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 const uploadUi = () => {
     const [activeTab, setActiveTab] = useState('Text');
     const [textContent, setTextContent] = useState('');
+    const [wikiContent, setWikiContent] = useState('');
     const [fileContent, setFileContent] = useState(null);
     const [output, setOutput] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,6 +16,9 @@ const uploadUi = () => {
 
     const handleTextChange = (e) => {
         setTextContent(e.target.value);
+    };
+    const handleWikiChange = (e) => {
+        setWikiContent(e.target.value);
     };
 
     const handleFileChange = (e) => {
@@ -44,6 +48,10 @@ const uploadUi = () => {
         if (activeTab === 'Text') {
             url = 'http://13.232.249.137/text';
             body = JSON.stringify({ text: textContent });
+        } else if (activeTab === 'Wiki'){
+            url = 'http://13.232.249.137/wiki';
+            console.log(wikiContent);
+            body = JSON.stringify({ text: wikiContent });
         } else if (activeTab === 'Document') {
             url = 'http://13.232.249.137/upload';
             const formData = new FormData();
@@ -54,7 +62,7 @@ const uploadUi = () => {
         try {
             const res = await fetch(url, {
                 method: "POST",
-                headers: activeTab === 'Text' ? { "Content-Type": "application/json" } : undefined,
+                headers: activeTab !== 'Document' ? { "Content-Type": "application/json" } : undefined,
                 body: body,
             });
             const data = await res.json();
@@ -84,6 +92,8 @@ const uploadUi = () => {
     const generateButtonIsGoingDisable = () => {
         if (activeTab === 'Text') {
             return textContent.length > 0 && (activeTab === 'Text')
+        } else if (activeTab === 'Wiki') {
+            return wikiContent.length > 0 && (activeTab === 'Wiki')
         } else if (activeTab === 'Document') {
             return activeTab === 'Document' && fileContent != null
         }
@@ -93,25 +103,31 @@ const uploadUi = () => {
             <div className="w-full max-w-2xl p-6 bg-white shadow-md rounded-lg">
                 <div className="tabs">
                     <a
-                        className={`tab tab-bordered ${activeTab === 'Text' ? 'tab-active bg-blue-500 text-white' : 'text-blue-500'}`}
+                        className={`tab tab-bordered ${activeTab === 'Text' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
                         onClick={() => handleTabChange('Text')}
                     >
                         Text
                     </a>
                     <a
-                        className={`tab tab-bordered ${activeTab === 'Document' ? 'tab-active bg-blue-500 text-white' : 'text-blue-500'}`}
+                        className={`tab tab-bordered ${activeTab === 'Wiki' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
+                        onClick={() => handleTabChange('Wiki')}
+                    >
+                        Wiki
+                    </a>
+                    <a
+                        className={`tab tab-bordered ${activeTab === 'Document' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
                         onClick={() => handleTabChange('Document')}
                     >
                         Document
                     </a>
                     <a
-                        className={`tab tab-bordered ${activeTab === 'Image' ? 'tab-active bg-blue-500 text-white' : 'text-blue-500'}`}
+                        className={`tab tab-bordered ${activeTab === 'Image' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
                         onClick={() => handleTabChange('Image')}
                     >
                         Image
                     </a>
                     <a
-                        className={`tab tab-bordered ${activeTab === 'Video' ? 'tab-active bg-blue-500 text-white' : 'text-blue-500'}`}
+                        className={`tab tab-bordered ${activeTab === 'Video' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
                         onClick={() => handleTabChange('Video')}
                     >
                         Video
@@ -125,6 +141,15 @@ const uploadUi = () => {
                             placeholder="Paste in your notes or other content"
                             value={textContent}
                             onChange={handleTextChange}
+                        ></textarea>
+                    )}
+                    {activeTab === 'Wiki' && (
+                        <textarea
+                            className="textarea textarea-bordered w-full"
+                            rows="1"
+                            placeholder="Paste Wikipedia Link"
+                            value={wikiContent}
+                            onChange={handleWikiChange}
                         ></textarea>
                     )}
                     {activeTab === 'Document' && (
