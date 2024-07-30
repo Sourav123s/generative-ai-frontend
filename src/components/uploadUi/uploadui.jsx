@@ -50,7 +50,6 @@ const uploadUi = () => {
             body = JSON.stringify({ text: textContent });
         } else if (activeTab === 'Wiki'){
             url = 'http://13.232.249.137/wiki';
-            console.log(wikiContent);
             body = JSON.stringify({ text: wikiContent });
         } else if (activeTab === 'Document') {
             url = 'http://13.232.249.137/upload';
