@@ -4,6 +4,7 @@ const uploadUi = () => {
     const [activeTab, setActiveTab] = useState('Text');
     const [textContent, setTextContent] = useState('');
     const [wikiContent, setWikiContent] = useState('');
+    const [youtubeContent, setYoutubeContent] = useState('');
     const [fileContent, setFileContent] = useState(null);
     const [output, setOutput] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +20,9 @@ const uploadUi = () => {
     };
     const handleWikiChange = (e) => {
         setWikiContent(e.target.value);
+    };
+    const handleYoutubeChange = (e) => {
+        setYoutubeContent(e.target.value);
     };
 
     const handleFileChange = (e) => {
@@ -51,6 +55,9 @@ const uploadUi = () => {
         } else if (activeTab === 'Wiki'){
             url = 'http://13.232.249.137/wiki';
             body = JSON.stringify({ text: wikiContent });
+        } else if (activeTab === 'Youtube'){
+            url = 'http://13.232.249.137/youtube';
+            body = JSON.stringify({ text: youtubeContent });
         } else if (activeTab === 'Document') {
             url = 'http://13.232.249.137/upload';
             const formData = new FormData();
@@ -93,6 +100,8 @@ const uploadUi = () => {
             return textContent.length > 0 && (activeTab === 'Text')
         } else if (activeTab === 'Wiki') {
             return wikiContent.length > 0 && (activeTab === 'Wiki')
+        } else if (activeTab === 'Youtube') {
+            return youtubeContent.length > 0 && (activeTab === 'Youtube')
         } else if (activeTab === 'Document') {
             return activeTab === 'Document' && fileContent != null
         }
@@ -114,6 +123,12 @@ const uploadUi = () => {
                         Wiki
                     </a>
                     <a
+                        className={`tab tab-bordered ${activeTab === 'Youtube' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
+                        onClick={() => handleTabChange('Youtube')}
+                    >
+                        Youtube
+                    </a>
+                    <a
                         className={`tab tab-bordered ${activeTab === 'Document' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
                         onClick={() => handleTabChange('Document')}
                     >
@@ -124,12 +139,6 @@ const uploadUi = () => {
                         onClick={() => handleTabChange('Image')}
                     >
                         Image
-                    </a>
-                    <a
-                        className={`tab tab-bordered ${activeTab === 'Video' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
-                        onClick={() => handleTabChange('Video')}
-                    >
-                        Video
                     </a>
                 </div>
                 <div className="mt-4">
@@ -149,6 +158,15 @@ const uploadUi = () => {
                             placeholder="Paste Wikipedia Link"
                             value={wikiContent}
                             onChange={handleWikiChange}
+                        ></textarea>
+                    )}
+                    {activeTab === 'Youtube' && (
+                        <textarea
+                            className="textarea textarea-bordered w-full"
+                            rows="1"
+                            placeholder="Paste Youtube Link"
+                            value={youtubeContent}
+                            onChange={handleYoutubeChange}
                         ></textarea>
                     )}
                     {activeTab === 'Document' && (
