@@ -5,9 +5,11 @@ const uploadUi = () => {
     const [textContent, setTextContent] = useState('');
     const [wikiContent, setWikiContent] = useState('');
     const [fileContent, setFileContent] = useState(null);
+    const [youtubeContent, setYoutubeContent] = useState('');
     const [output, setOutput] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [number, setNumber] = useState('');
     const fileInputRef = useRef(null);
 
     const handleTabChange = (tab) => {
@@ -21,9 +23,17 @@ const uploadUi = () => {
         setWikiContent(e.target.value);
     };
 
+    const handelYoutubeVideChange = (e) => {
+        setYoutubeContent(e.target.value)
+    };
+
     const handleFileChange = (e) => {
         e.preventDefault();
         setFileContent(e.target.files[0]);
+    };
+
+    const handleNumberChange = (e) => {
+        setNumber(e.target.value);
     };
 
     const formattedOutputFormat = (output) => {
@@ -47,15 +57,19 @@ const uploadUi = () => {
 
         if (activeTab === 'Text') {
             url = 'http://13.232.249.137/text';
-            body = JSON.stringify({ text: textContent });
-        } else if (activeTab === 'Wiki'){
+            body = JSON.stringify({ text: textContent, number: number });
+        } else if (activeTab === 'Wiki') {
             url = 'http://13.232.249.137/wiki';
-            body = JSON.stringify({ text: wikiContent });
+            body = JSON.stringify({ text: wikiContent, number: number });
         } else if (activeTab === 'Document') {
             url = 'http://13.232.249.137/upload';
             const formData = new FormData();
             formData.append('file', fileContent);
+            formData.append('number', number);
             body = formData;
+        } else if (activeTab === 'Youtube') {
+            url = 'http://13.232.249.137/youtube';
+            body = JSON.stringify({ text: youtubeContent, number: number });
         }
 
         try {
@@ -78,11 +92,23 @@ const uploadUi = () => {
         }
     };
     const handleCopyOutput = () => {
-        if (output) {
-            const outputText = output.map(item => item.props.children[0].props.children + '\n' +
-                item.props.children[1].props.children.map(opt => opt.props.children + '\n').join('') +
-                'Answer: ' + item.props.children[2].props.children[1] + '\n'
-            ).join('\n');
+        // if (output) {
+        //     const outputText = output.map(item => item.props.children[0].props.children + '\n' +
+        //         item.props.children[1].props.children.map(opt => opt.props.children + '\n').join('') +
+        //         'Answer: ' + item.props.children[2].props.children[1] + '\n'
+        //     ).join('\n');
+
+        //     navigator.clipboard.writeText(outputText);
+        // }
+        if (output.length > 0) {
+            const outputText = output.map((item, index) => {
+                console.log(item.props.children)
+                const question = item.props.children[0].props.children[1];
+                const options = item.props.children[1].props.children.map((opt, optIndex) => `${optIndex + 1}. ${opt.props.children}`).join('\n');
+                const answer = item.props.children[2].props.children[1];
+                return `Q${index + 1}. ${question}\n${options}\nAnswer: ${answer}\n`;
+            }).join('\n\n');
+
 
             navigator.clipboard.writeText(outputText);
         }
@@ -95,6 +121,8 @@ const uploadUi = () => {
             return wikiContent.length > 0 && (activeTab === 'Wiki')
         } else if (activeTab === 'Document') {
             return activeTab === 'Document' && fileContent != null
+        } else if (activeTab === 'Youtube') {
+            return youtubeContent.length > 0 && (activeTab === 'Youtube')
         }
     }
     return (
@@ -119,46 +147,103 @@ const uploadUi = () => {
                     >
                         Document
                     </a>
-                    <a
+                    {/* <a
                         className={`tab tab-bordered ${activeTab === 'Image' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
                         onClick={() => handleTabChange('Image')}
                     >
                         Image
-                    </a>
+                    </a> */}
                     <a
-                        className={`tab tab-bordered ${activeTab === 'Video' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
-                        onClick={() => handleTabChange('Video')}
+                        className={`tab tab-bordered ${activeTab === 'Youtube' ? 'tab-active bg-blue-500 text-white rounded-xl' : 'text-blue-500'}`}
+                        onClick={() => handleTabChange('Youtube')}
                     >
-                        Video
+                        YouTube
                     </a>
                 </div>
                 <div className="mt-4">
                     {activeTab === 'Text' && (
-                        <textarea
-                            className="textarea textarea-bordered w-full"
-                            rows="10"
-                            placeholder="Paste in your notes or other content"
-                            value={textContent}
-                            onChange={handleTextChange}
-                        ></textarea>
+                        <div>
+                            <textarea
+                                className="textarea textarea-bordered w-full"
+                                rows="10"
+                                placeholder="Paste in your notes or other content"
+                                value={textContent}
+                                onChange={handleTextChange}
+                            ></textarea>
+                            <select
+                                className="select select-bordered w-full mt-4"
+                                value={number}
+                                onChange={handleNumberChange}
+                            >
+                                <option value="" disabled>Select number of questions</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
                     )}
                     {activeTab === 'Wiki' && (
-                        <textarea
-                            className="textarea textarea-bordered w-full"
-                            rows="1"
-                            placeholder="Paste Wikipedia Link"
-                            value={wikiContent}
-                            onChange={handleWikiChange}
-                        ></textarea>
+                        <div>
+                            <textarea
+                                className="textarea textarea-bordered w-full"
+                                rows="1"
+                                placeholder="Paste Wikipedia Link"
+                                value={wikiContent}
+                                onChange={handleWikiChange}
+                            ></textarea>
+                            <select
+                                className="select select-bordered w-full mt-4"
+                                value={number}
+                                onChange={handleNumberChange}
+                            >
+                                <option value="" disabled>Select number of questions</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
                     )}
                     {activeTab === 'Document' && (
-                        <input
-                            type="file"
-                            className="file-input file-input-bordered w-full"
-                            // value={fileContent ? fileContent : ''}
-                            onChange={handleFileChange}
-                            ref={fileInputRef}
-                        />
+                        <div>
+                            <input
+                                type="file"
+                                className="file-input file-input-bordered w-full"
+                                // value={fileContent ? fileContent : ''}
+                                onChange={handleFileChange}
+                                ref={fileInputRef}
+                            />
+                            <select
+                                className="select select-bordered w-full mt-4"
+                                value={number}
+                                onChange={handleNumberChange}
+                            >
+                                <option value="" disabled>Select number of questions</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
+                    )}
+                    {activeTab === 'Youtube' && (
+                        <div>
+                            <textarea
+                                className="textarea textarea-bordered w-full"
+                                rows="1"
+                                placeholder="Paste Youtube Link"
+                                value={youtubeContent}
+                                onChange={handelYoutubeVideChange}
+                            ></textarea>
+                            <select
+                                className="select select-bordered w-full mt-4"
+                                value={number}
+                                onChange={handleNumberChange}
+                            >
+                                <option value="" disabled>Select number of questions</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
                     )}
                 </div>
                 <div className="mt-4 flex justify-end">
